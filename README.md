@@ -8,18 +8,64 @@ This project deploys a [T-Pot](https://github.com/telekom-security/tpotce) multi
 
 ## Architecture
 
-```
-Internet
-   │
-   ▼
-[Public IP] ── NSG (deny-by-default, isolation rules)
-   │
-   ▼
-[VNet]
-   └── [Subnet]
-         └── [VM: T-Pot]
-               ├── SSH (management access only)
-               └── All other ports → honeypot services (Docker-based, via T-Pot)
+```mermaid
+flowchart LR
+    Internet([Public Internet])
+    Admin([Security Analyst / Admin])
+
+    subgraph VNET["Virtual Network (VNet)"]
+        subgraph SUBNET["Subnet"]
+            subgraph NSG["Network Security Group (NSG)"]
+                direction LR
+                RuleIn["Inbound Rule<br/>ALLOW ALL (*)"]
+                subgraph VM["Virtual Machine (Linux Host)"]
+                    subgraph TPOT["T-Pot Honeypot Platform"]
+                        direction TB
+                        Auth{"Auth Gate<br/>User + Password"}
+                        UI["T-Pot Web Interface<br/>Kibana / Cockpit"]
+                        Traps["Honeypot Daemons<br/>Cowrie, Dionaea, etc."]
+                        Auth -->|Authorized| UI
+                    end
+                end
+                RuleOut["Outbound Rule<br/>DENY ALL (*)"]
+            end
+        end
+    end
+
+    Drop([Egress Blocked])
+
+    %% 1. Inbound Attack Flow to Traps
+    Internet ==>|1. Attack Probes / Exploits| RuleIn
+    RuleIn ==>|Forwarded| Traps
+
+    %% 2. Admin Ingress with Auth
+    Admin ==>|2. HTTPS Access :64297| RuleIn
+    RuleIn ==>|Login Request| Auth
+
+    %% 3. Outbound Containment Flow
+    VM -.->|3. Egress Attempt| RuleOut
+    RuleOut -.-x|Drop at Perimeter| Drop
+
+    %% High-Contrast Theme Styles
+    style Internet fill:#f1f5f9,stroke:#475569,stroke-width:2px,color:#0f172a
+    style Admin fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0369a1
+    style VNET fill:#ffffff,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4,color:#0369a1
+    style SUBNET fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,stroke-dasharray: 2 2,color:#334155
+    style NSG fill:#f1f5f9,stroke:#0f172a,stroke-width:2px,color:#0f172a
+    style RuleIn fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style VM fill:#ffffff,stroke:#0284c7,stroke-width:2px,color:#0f172a
+    style TPOT fill:#f8fafc,stroke:#7c3aed,stroke-width:2px,color:#5b21b6
+    style Auth fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#92400e
+    style UI fill:#ede9fe,stroke:#7c3aed,stroke-width:1.5px,color:#5b21b6
+    style Traps fill:#fee2e2,stroke:#ef4444,stroke-width:1.5px,color:#991b1b
+    style RuleOut fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    style Drop fill:#fee2e2,stroke:#ef4444,stroke-width:2px,stroke-dasharray: 4 4,color:#991b1b
+
+    %% Colored Links
+    linkStyle 0,1 stroke:#dc2626,stroke-width:2px
+    linkStyle 2,3 stroke:#16a34a,stroke-width:2px
+    linkStyle 4 stroke:#7c3aed,stroke-width:2px
+    linkStyle 5,6 stroke:#b91c1c,stroke-width:2px
 ```
 
 - **VNet / Subnet:** A dedicated virtual network and subnet, used exclusively for this honeypot — not peered or connected to any other network, home lab, or production resources.
@@ -56,7 +102,14 @@ Data collection began as soon as the VM was deployed and exposed. T-Pot captures
 
 ## Findings / Observations
 
-*(To be filled in as data accumulates — e.g., top source countries/IPs, most-targeted ports, common exploit signatures, notable payloads.)*
+**Top source countries (by attacker IP volume):**
+1. Pakistan
+2. Bulgaria
+3. Netherlands
+
+**Most-targeted port:** Telnet
+
+*(To be expanded as more data accumulates — e.g., common exploit signatures, notable payloads, credential patterns.)*
 
 ## Lessons Learned
 
