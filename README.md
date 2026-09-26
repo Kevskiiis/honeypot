@@ -102,6 +102,8 @@ Data collection began as soon as the VM was deployed and exposed. T-Pot captures
 
 ## Findings / Observations
 
+This project was recently deployed, so data collection is still early. A preliminary snapshot so far:
+
 **Top source countries (by attacker IP volume):**
 1. Pakistan
 2. Bulgaria
@@ -109,11 +111,17 @@ Data collection began as soon as the VM was deployed and exposed. T-Pot captures
 
 **Most-targeted port:** Telnet
 
-*(To be expanded as more data accumulates — e.g., common exploit signatures, notable payloads, credential patterns.)*
+A full analysis (common exploit signatures, notable payloads, credential patterns) is planned once more data has accumulated.
 
-## Lessons Learned
+## What I Learned
 
-*(To be filled in — e.g., NSG rule surprises, T-Pot resource usage, volume of noise vs. signal.)*
+As a student building this as a hands-on learning project, the deployment itself covered several core Azure networking and security concepts:
+
+- **VNets and subnets:** What a Virtual Network is, and how to create one along with a subnet inside it.
+- **NSGs:** What a Network Security Group is for, and how to attach one to a subnet so it acts as a security filter controlling inbound and outbound traffic.
+- **VM deployment:** How to deploy a virtual machine and attach it to the correct network and subnet to maximize isolation and security.
+
+Next up is learning to analyze the captured T-Pot data itself — identifying attack patterns, correlating source IPs, and pulling out meaningful trends from the noise.
 
 ## Future Improvements
 
@@ -123,4 +131,4 @@ Data collection began as soon as the VM was deployed and exposed. T-Pot captures
 
 ## Disclaimer
 
-This honeypot is deployed in an isolated environment for educational and research purposes only. It is not connected to any production systems.
+This honeypot is deployed in an isolated environment for educational purposes only. It is not connected to any production systems.
