@@ -105,8 +105,8 @@ Data collection began as soon as the VM was deployed and exposed. T-Pot captures
 This project was recently deployed, so data collection is still early. A preliminary snapshot so far:
 
 **Top source countries (by attacker IP volume):**
-1. Pakistan
-2. Bulgaria
+1. United States
+2. Pakistan
 3. Netherlands
 
 **Most-targeted port:** Telnet
